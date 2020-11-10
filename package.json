@@ -1,0 +1,20 @@
+{
+  "name": "api-salao-de-beleza-trabalho-ESOF2-IFSUL",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ERAjeje/api-salao-de-beleza-trabalho-ESOF2-IFSUL.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ERAjeje/api-salao-de-beleza-trabalho-ESOF2-IFSUL/issues"
+  },
+  "homepage": "https://github.com/ERAjeje/api-salao-de-beleza-trabalho-ESOF2-IFSUL#readme"
+}
