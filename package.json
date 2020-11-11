@@ -1,10 +1,11 @@
 {
-  "name": "api-salao-de-beleza-trabalho-ESOF2-IFSUL",
+  "name": "api_salao",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon -r dotenv/config --experimental-modules index.js"
   },
   "repository": {
     "type": "git",
@@ -16,5 +17,15 @@
   "bugs": {
     "url": "https://github.com/ERAjeje/api-salao-de-beleza-trabalho-ESOF2-IFSUL/issues"
   },
-  "homepage": "https://github.com/ERAjeje/api-salao-de-beleza-trabalho-ESOF2-IFSUL#readme"
+  "homepage": "https://github.com/ERAjeje/api-salao-de-beleza-trabalho-ESOF2-IFSUL#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.10.13"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  },
+  "type": "module"
 }
