@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import crypto from 'crypto';
 
 
 const { Schema } = mongoose;
@@ -19,6 +20,7 @@ const userSchema = new Schema({
         type: String,
         required: true,
         select: false,
+        set: value => crypto.createHash('sha256').update(value).digest('hex'),
     },
     },
     {
