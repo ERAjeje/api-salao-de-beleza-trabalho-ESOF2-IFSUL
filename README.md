@@ -19,6 +19,7 @@ git clone https://github.com/ERAjeje/api-salao-de-beleza-trabalho-ESOF2-IFSUL.gi
 ```
 Após o clone do repositório é necessário instalar as dependencias do projeto através do comando
 ```
+cd api-salao-de-beleza-trabalho-ESOF2-IFSUL
 npm install
 ```
 Uma vez instaladas as dependências, é necessária a criação de uma conta no MongoDB Atlas ou uma instancia local do MongoDB e criação de um arquivo .env utilzando como exemplo o .sampleEnv. Nesse arquivo estão a SECRET que será utilizada pelo JWT na criptografia e verificação do token, a PORT para utilização do banco e a string de conexão MONGODB_URL para conexão com o banco mongodb, seja em uma instancia local ou no MongoDB Atlas.
