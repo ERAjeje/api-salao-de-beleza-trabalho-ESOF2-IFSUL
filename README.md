@@ -44,7 +44,7 @@ Para realização de cadastro de um novo usuário (Signup) utilize a rota "*/v1/
 ```
 Esses são campos obrigatórios no banco e na falta de um ou mais desses campos, a requisição retornará um status 500 e um erro informando os campos obrigatórios que não foram preenchidos.
 
-Para realização de login no sistema utiliza-se a rota "*/v1/login*". Nela as informações de login (user e password) são informados através do headers authorization e utiliza-se uma rota do tipo GET. Essa forma de trafego de dados para login é mais segura que a forma mais usual, utilizando rota POST e informações no body.
+Para realização de login no sistema utiliza-se a rota "*/v1/login*". Nela as informações de login (user e password) são informados através do headers authorization como Basic Auth e utiliza-se uma rota do tipo GET. Essa forma de trafego de dados para login é mais segura que a forma mais usual, utilizando rota POST e informações no body.
 Essa rota retornará ao solicitante um documento json com os dados do usuário logado e um token de autorização de sessão. Esse token tem um tempo de vida de 86400 segundos e após expirado a sessão do usuário será cancelada. Essa resposta segue o modelo
 ```
 {
@@ -59,7 +59,7 @@ Essa rota retornará ao solicitante um documento json com os dados do usuário l
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNWZhY2E5ZGQ1Y2JiNGMwZGQ0NzBmODMxIiwiaWF0IjoxNjA1MTUzMDE4LCJleHAiOjE2MDUyMzx0MTh9.y1ppeUQ99_VrtYdkcrXyUxbDYFwTgui0jfs0_5zHsRY"
 }
 ```
-Para acesso de uma rota autenticada (rota que necessita de login para acesso) é necessário informar o token recebido no momento do login. Esse token deve ser informado através do headers authorization. Caso esse token não seja informado ou não seja válido, a rota autenticada retornará um status 400.
+Para acesso de uma rota autenticada (rota que necessita de login para acesso) é necessário informar o token recebido no momento do login. Esse token deve ser informado através do headers authorization como um Bearer token. Caso esse token não seja informado ou não seja válido, a rota autenticada retornará um status 400.
 
 A rota "*/v1/me*" retorna o usuário logado através da validação do token que será informado no headers authorization. O modelo de resposta é
 ```
