@@ -1,69 +1,32 @@
 import express from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+
+import { autentication } from '../utils/autentication.js';
+
+import { RouterTest, Signup, Login, GetUsers, GetLoggedUser } from '../controllers/routesController.js'
 import { UserModel } from '../models/user.model.js';
 
-import { sign, verify } from '../utils/jwt.js'
-
 const routes = express();
-routes.use(express.json());
-
-const autentication = async (req, res, next) => {
-    const [type, token] = req.headers.authorization.split(" ");
-    try {
-        const payload = verify(token);
-        const user = await UserModel.findById(payload.user);
-        if(!user){
-            res.status(401).send({ error: `User ${email} not found.` });
-        }
-        req.auth = user;
-        next();
-    } catch (err) {
-        res.send({ error: err });
-    }
-}
-
-routes.get('/', (req, res) => {
-    res.send({message: "rota funcionando", route: req.method})
+routes.use(bodyParser.json());
+routes.use(bodyParser.urlencoded({ extended: true }));
+routes.use((_, res, next) => {
+	//Qual site tem permissão de realizar a conexão
+    res.header("Access-Control-Allow-Origin", "localhost");
+	//Quais são os métodos que a conexão pode realizar na API
+    res.header("Access-Control-Allow-Methods", 'GET,PUT,POST,DELETE');
+    routes.use(cors());
+    next();
 });
 
-routes.post('/signup', async (req, res) => {
-    try {
-        const user = await UserModel.create(req.body);
-        const { id, name, email, createdAt, updatedAt } = user;
-        const token = sign({ user: id })
-        res.send({ id, name, email, createdAt, updatedAt, token });
-    } catch (err) {
-        res.status(400).send(err);
-    }
-});
+routes.get('/', RouterTest);
 
-routes.get('/login', async (req, res) => {
-    const [basic, hash] = req.headers.authorization.split(' ');
-    const credentials = Buffer.from(hash, 'base64').toString();
-    const [email, password] = credentials.split(':');
-    try {
-        const user = await UserModel.findOne({ email, password });
+routes.post('/signup', Signup);
 
-        if(!user){
-            res.status(401).send({ error: `User ${email} not found.` });
-        }
-        const token = sign({ user: user.id });
-        res.send({ user, token });
-    } catch (err) {
-        res.send({ error: err });
-    }
-});
+routes.get('/login', Login);
 
-routes.get('/users', autentication, async (req, res) => {
-    try {
-        const users = await UserModel.find();
-        res.send(users);
-    } catch (err) {
-        res.send({ error: err });
-    }
-});
+routes.get('/users', autentication(req, res, next, UserModel), GetUsers);
 
-routes.get('/me', autentication, (req, res) => {
-    res.send(req.auth);
-})
+routes.get('/me', autentication(req, res, next, UserModel), GetLoggedUser);
 
 export default routes;
