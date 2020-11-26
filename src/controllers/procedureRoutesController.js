@@ -13,7 +13,7 @@ export const GetProcedureById = async (req, res) => {
     const id = req.body.id;
     const _id = ObjectId(id);
     try {
-        const data = await ClientModel.findOne({ _id });
+        const data = await ProcedureModel.findOne({ _id });
 
         if(!data){
             res.status(401).send({ error: `Procedure ${id} not found.` });
@@ -28,7 +28,7 @@ export const GetProcedureById = async (req, res) => {
 export const GetProcedureByName = async (req, res) => {
     const name = req.body.name;
     try {
-        const data = await ClientModel.findOne({ name });
+        const data = await ProcedureModel.findOne({ name });
 
         if(!data){
             res.status(401).send({ error: `Procedure ${name} not found.` });
@@ -43,7 +43,7 @@ export const GetProcedureByName = async (req, res) => {
 export const GetProceduresByType = async (req, res) => {
     const type = req.body.type;
     try {
-        const data = await ClientModel.findOne({ type });
+        const data = await ProcedureModel.findOne({ type });
 
         if(!data){
             res.status(401).send({ error: `Not found Procedures with type ${type}.` });
