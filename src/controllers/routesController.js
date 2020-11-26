@@ -1,22 +1,26 @@
 
 import { UserModel } from '../models/user.model.js';
 
-import { sign } from '../utils/jwt.js';
+import { sign, verify } from '../utils/jwt.js';
 
-// export const autentication = async (req, res, next) => {
-//     const [type, token] = req.headers.authorization.split(" ");
-//     try {
-//         const payload = verify(token);
-//         const user = await UserModel.findById(payload.user);
-//         if(!user){
-//             res.status(401).send({ error: `User ${email} not found.` });
-//         }
-//         req.auth = user;
-//         next();
-//     } catch (err) {
-//         res.send({ error: err });
-//     }
-// }
+export const autentication = async (req, res, next) => {
+    if (!req.headers.authorization) {
+        res.status(400).send({ error: 'Authorization is required to access this route' });
+    } else {
+        const [type, token] = req.headers.authorization.split(" ");
+        try {
+            const payload = verify(token);
+            const user = await UserModel.findById(payload.user);
+            if (!user) {
+                res.status(401).send({ error: `User ${email} not found.` });
+            }
+            req.auth = user;
+            next();
+        } catch (err) {
+            res.send({ error: err });
+        }
+    }
+}
 
 export const RouterTest = (req, res) => {
     res.send({message: "rota funcionando", route: req.method})
