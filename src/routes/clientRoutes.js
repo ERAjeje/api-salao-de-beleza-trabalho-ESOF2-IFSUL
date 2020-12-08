@@ -2,7 +2,16 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
-import { autentication } from '../utils/autentication.js'
+import { 
+    ClientSignup, 
+    ClientLogin, 
+    GetLoggedClient, 
+    autentication, 
+    GetClients, 
+    CreateProcedure, 
+    GetProceduresByClient,
+    GetDateAvailability, 
+} from '../controllers/clientRoutesController.js';
 
 const clientRoute = express();
 
@@ -16,3 +25,20 @@ clientRoute.use((_, res, next) => {
     clientRoute.use(cors());
     next();
 });
+
+clientRoute.get('/me', autentication, GetLoggedClient);
+
+clientRoute.get('/clients', autentication, GetClients);
+
+clientRoute.get('/procedures', autentication, GetProceduresByClient);
+
+clientRoute.post('/procedure', autentication, CreateProcedure);
+
+clientRoute.get('/date-availability', autentication, GetDateAvailability);
+
+clientRoute.get('/login', ClientLogin);
+
+clientRoute.get('/signup', ClientSignup);
+
+
+export default clientRoute;
