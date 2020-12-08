@@ -41,5 +41,5 @@ const ProcedureSchema = new Schema({
     }
 );
 
-export const ProcedureModel = mongoose.model('procedure', ProcedureSchema);
+export const ProcedureModel = mongoose.model('procedure', ProcedureSchema, 'procedure');
 export const ObjectId = mongoose.type.ObjectId;

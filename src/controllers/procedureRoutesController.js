@@ -1,4 +1,25 @@
+import { verify } from '../utils/jwt.js';
+import { ClientModel } from '../models/client.model.js';
 import { ObjectId, ProcedureModel } from '../models/procedure.model.js';
+
+export const autentication = async (req, res, next) => {
+    if (!req.headers.authorization) {
+        res.status(400).send({ error: 'Authorization is required to access this route' });
+    } else {
+        const [type, token] = req.headers.authorization.split(" ");
+        try {
+            const payload = verify(token);
+            const user = await ClientModel.findById(payload.user);
+            if (!user) {
+                res.status(401).send({ error: `User ${email} not found.` });
+            }
+            req.auth = user;
+            next();
+        } catch (err) {
+            res.send({ error: err });
+        }
+    }
+}
 
 export const GetProcedures = async (_, res) => {
     try {
