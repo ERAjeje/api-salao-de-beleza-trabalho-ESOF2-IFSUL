@@ -27,6 +27,10 @@ const userSchema = new Schema({
         select: false,
         set: value => crypto.createHash('sha256').update(value).digest('hex'),
     },
+    role: {
+        type: String,
+        required: true
+    }
     },
     {
     timestamps: true,
@@ -37,3 +41,4 @@ const userSchema = new Schema({
 );
 
 export const UserModel = mongoose.model('user', userSchema, 'users');
+export const ObjectId = mongoose.Types.ObjectId;
