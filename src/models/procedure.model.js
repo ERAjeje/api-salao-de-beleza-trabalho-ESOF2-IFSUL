@@ -7,6 +7,7 @@ const ProcedureSchema = new Schema({
         type: String,
         unique: true,
         uppercase: true,
+        required: true
     },
     type: {
         type: String,
