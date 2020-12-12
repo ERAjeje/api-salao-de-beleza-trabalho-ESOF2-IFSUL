@@ -1,6 +1,6 @@
 import { sign, verify } from '../utils/jwt.js';
 import { ClientModel } from '../models/client.model.js';
-import { ProceduresModel } from '../models/procedures.model.js';
+import { ObjectId } from '../models/user.model.js';
 
 export const autentication = async (req, res, next) => {
     if (!req.headers.authorization) {
@@ -64,29 +64,46 @@ export const GetClients = async (_, res) => {
 }
 
 export const CreateProcedure = async (req, res) => {
-    const { procedureId, userId, date, hour, clientId } = req.body;
+    const { id } = req.body;
     try {
-        const data = await ProceduresModel.create({ procedureId, userId, date, hour, clientId });
-        res.send(data)
+        const _id = ObjectId(id);
+        let client = await ClientModel.findOne(_id);
+        const procedure = {
+            "procedureId": req.body.procedureId,
+            "userId": req.body.userId,
+            "date": req.body.date,
+            "hour": req.body.hour
+        }
+        client.procedures.push(procedure);
+        const data = await ClientModel.updateOne({_id: client.id}, client);
+        if(data.n){
+            res.send(client)
+        }else{
+            throw Error('Non-updated. Error in process.')
+        }
     } catch (err) {
         res.send({ error: err });
     }
 }
 
 export const GetProceduresByClient = async (req, res) => {
-    const { clientId } = req.body;
+    const { id } = req.body;
     try {
-        const data = await ProceduresModel.find({ clientId });
-        res.send(data);
+        const _id = ObjectId(id)
+        const data = await ClientModel.findOne(_id);
+        res.send(data.procedures);
     } catch (err) {
         res.send({ error: err });
     }
 }
 
 export const GetDateAvailability = async (req, res) => {
-    const { month } = req.body;
+    const { date } = req.body;
     try {
-        const availability = await ProceduresModel.find({ "date": RegExp(month)})
+        const availability = await ClientModel.find({ "procedures.date": RegExp(date, "i")}, 'procedures')
+        // let dates = availability.map(item => {
+        //     return item.procedures
+        // }).map(item => item.map(item => item.date));
         res.send(availability)
     } catch (err) {
         res.send({ error: err });
