@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import crypto from 'crypto';
+import { ProceduresSchema } from './procedures.model.js';
 
 
 const { Schema } = mongoose;
@@ -31,6 +32,7 @@ const clientSchema = new Schema({
         select: false,
         set: value => crypto.createHash('sha256').update(value).digest('hex'),
     },
+    procedures: [ProceduresSchema]
     },
     {
     timestamps: true,
