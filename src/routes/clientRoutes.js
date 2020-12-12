@@ -32,13 +32,13 @@ clientRoute.get('/clients', autentication, GetClients);
 
 clientRoute.get('/procedures', autentication, GetProceduresByClient);
 
-clientRoute.post('/procedure', autentication, CreateProcedure);
+clientRoute.put('/procedure', autentication, CreateProcedure);
 
 clientRoute.get('/date-availability', autentication, GetDateAvailability);
 
 clientRoute.get('/login', ClientLogin);
 
-clientRoute.get('/signup', ClientSignup);
+clientRoute.post('/signup', ClientSignup);
 
 
 export default clientRoute;
