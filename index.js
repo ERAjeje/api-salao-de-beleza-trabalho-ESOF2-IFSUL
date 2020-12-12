@@ -5,7 +5,9 @@ import cors from 'cors';
 import { db } from './src/data/mongo.js';
 
 import v1Route from './src/routes/routes.js';
+import ClientRoute from './src/routes/clientRoutes.js';
 import ProductRoute from './src/routes/productRoutes.js';
+import ProcedureRoute from './src/routes/procedureRoutes.js';
 
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsDoc from 'swagger-jsdoc';
@@ -20,8 +22,15 @@ const swaggerOpbions = {
             contact: {
                 name: "Edson Ajeje, Thayron Oliveira"
             },
+            license: {
+                name: "MIT",
+                url: "https://mit-license.org/"
+            },
             servers: [
-                "https://localhost:3000"
+                {
+                    url: "https://localhost:3000",
+                    description: "A Development server"
+                }
             ]
         },
         definitions: {
@@ -44,6 +53,14 @@ const swaggerOpbions = {
                         type: "string",
                         required: true
                     }
+                },
+                examples: {
+                    id: "5facaccf382bab01c0092586",
+                    name: "Edson Ajeje",
+                    email: "edson1@ajeje.com",
+                    createdAt: "2020-11-12T03:32:31.826Z",
+                    updatedAt: "2020-11-12T03:32:31.826Z",
+                    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNWZhY2FjY2YzODJiYWIwMWMwMDkyNTg2IiwiaWF0IjoxNjA1MTUxOTUxLCJleHAiOjE2MDUyMzgzNTF9.JQ4zKArfT8yZckM4BQXXbA20S-L3Wi4VAouvgt_6h7c"
                 }
             },
             product: {
@@ -91,22 +108,111 @@ const swaggerOpbions = {
                         required: true
                     },
                     products: {
-                        productId: {
-                            type: "string",
+                        type: "array",
+                        properties: {
+                            productId: {
+                                type: "string",
+                                required: true,
+                                unique: true
+                            },
+                            unit: {
+                                type: "string",
+                                required: true
+                            },
+                            amount: {
+                                type: "number",
+                                required: true
+                            },
                             required: true,
-                            unique: true
-                        },
-                        unit: {
-                            type: "string",
-                            required: true
-                        },
-                        amount: {
-                            type: "number",
-                            required: true
-                        },
-                        required: true,
+                        }
                     }
                 }
+            },
+            procedures: {
+                type: "object",
+                properties: {
+                    procedureId: {
+                        type: "string"
+                    },
+                    userId: {
+                        type: "string"
+                    },
+                    date: {
+                        type: "string"
+                    },
+                    hour: {
+                        type: "string"
+                    }
+                }
+            },
+            productItem: {
+                type: "object",
+                properties: {
+                    productId: {
+                        type: "string",
+                        required: true,
+                        unique: true
+                    },
+                    unit: {
+                        type: "string",
+                        required: true
+                    },
+                    amount: {
+                        type: "number",
+                        required: true
+                    }
+                }
+            },
+            client: {
+                type: "object",
+                properties: {
+                    name: {
+                        type: "string",
+                        required: true
+                    },
+                    cpf: {
+                        type: "string",
+                        required: true
+                    },
+                    cellphone: {
+                        type: "string",
+                        required: true
+                    },
+                    email: {
+                        type: "string",
+                        required: true
+                    },
+                    password: {
+                        type: "string",
+                        required: true
+                    },
+                    procedures: {
+                        type: "array",
+                        properties: {
+                            procedureId: {
+                                type: "string"
+                            },
+                            userId: {
+                                type: "string"
+                            },
+                            date: {
+                                type: "string"
+                            },
+                            hour: {
+                                type: "string"
+                            }
+                        }
+                    }
+                }
+            },
+        },
+        schemes: ["http"],
+        securityDefinitions: {
+            api_key: {
+                type: "http",
+                scheme: "bearer",
+                bearerFormat: "JWT",
+                in: "header"
             },
         }
     },
@@ -122,6 +228,7 @@ app.use(cors({
 
 const swaggerDocs = swaggerJsDoc(swaggerOpbions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 
 // Routes
 /**
@@ -194,10 +301,6 @@ app.use('/v1', v1Route);
  *  get:
  *      description: Use to get all products in API
  *      parameters:
- *      - in: "header"
- *        name: "Bearer Token"
- *        description: "A Bearer token into de header authorization"
- *        required: true
  *        schema:
  *          $ref: "#/definitions/product"
  *      responses:
@@ -206,6 +309,10 @@ app.use('/v1', v1Route);
  *  post:
  *      description: Use to create a products in API
  *      parameters:
+ *      - in: "header"
+ *        name: "Token"
+ *        description: "A Bearer token into de header authorization"
+ *        required: true
  *      - in: "body"
  *        name: "json"
  *        description: "A product object that needs to be added to the API"
@@ -298,6 +405,40 @@ app.use('/v1', v1Route);
  * 
  */
 app.use('/v1/products', ProductRoute);
+
+// Routes
+/**
+ * 
+ * @swagger
+ * /v1/clients:
+ *  get:
+ *      description: Use to get all clients in API
+ *      parameters:
+ *      - in: "header"
+ *        name: "Bearer Token"
+ *        description: "A Bearer token into de header authorization"
+ *        required: true
+ *      responses:
+ *          '200':
+ *              description: A seccessful response 
+ * /v1/clients/login:
+ * get:
+ *     description: Use to Client Login into API
+ *     parameters: 
+ *     - in: "header"
+ *       name: "Basic Auth"
+ *       description: "A user object that needs to be added to the API. Uses a base64 hash formed of the email and password."
+ *       required: true
+ *       schema:
+ *         $ref: "#/definitions/client"
+ *     responses:
+ *         '200':
+ *             description: A seccessful response
+ * 
+ */
+app.use('/v1/client', ClientRoute);
+
+app.use('/v1/procedure', ProcedureRoute);
 
 app.listen(3000, async () => {
     console.log("api em funcionamento");
