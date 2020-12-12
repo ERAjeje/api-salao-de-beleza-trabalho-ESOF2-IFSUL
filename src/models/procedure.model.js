@@ -2,6 +2,21 @@ import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
 
+const ProdutInProcedureSchema = new Schema({
+    productId: {
+        type: String,
+        required: true,
+    },
+    unit: {
+        type: String,
+        required: true,
+    },
+    amount: {
+        type: Number,
+        required: true
+    }
+});
+
 const ProcedureSchema = new Schema({
     name: {
         type: String,
@@ -17,22 +32,7 @@ const ProcedureSchema = new Schema({
         type: String,
         required: true,
     },
-    products: {
-        productId: {
-            type: String,
-            required: true,
-            unique: true,
-        },
-        unit: {
-            type: String,
-            required: true,
-        },
-        amount: {
-            type: Number,
-            required: true
-        },
-        required: true,
-    },
+    products: [ProdutInProcedureSchema],
 },
     {
         timestamps: true,
@@ -43,4 +43,4 @@ const ProcedureSchema = new Schema({
 );
 
 export const ProcedureModel = mongoose.model('procedure', ProcedureSchema, 'procedure');
-export const ObjectId = mongoose.type.ObjectId;
+export const ObjectId = mongoose.Types.ObjectId;
