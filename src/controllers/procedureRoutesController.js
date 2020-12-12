@@ -1,6 +1,7 @@
 import { verify } from '../utils/jwt.js';
 import { ClientModel } from '../models/client.model.js';
 import { ObjectId, ProcedureModel } from '../models/procedure.model.js';
+import { UserModel } from '../models/user.model.js';
 
 export const autentication = async (req, res, next) => {
     if (!req.headers.authorization) {
@@ -21,6 +22,15 @@ export const autentication = async (req, res, next) => {
     }
 }
 
+const userAuthorization = async (_id) => {
+    const user = await UserModel.findOne(_id)
+    if(user) {
+        return true
+    } else {
+        return new Error("Operation unavailable for this user category")
+    }
+}
+
 export const GetProcedures = async (_, res) => {
     try {
         const data = await ProcedureModel.find();
@@ -32,13 +42,13 @@ export const GetProcedures = async (_, res) => {
 
 export const GetProcedureById = async (req, res) => {
     const id = req.body.id;
-    const _id = ObjectId(id);
     try {
+        const _id = ObjectId(id);
         const data = await ProcedureModel.findOne({ _id });
 
-        if(!data){
+        if (!data) {
             res.status(401).send({ error: `Procedure ${id} not found.` });
-        }else{
+        } else {
             res.send({ data });
         }
     } catch (err) {
@@ -49,11 +59,11 @@ export const GetProcedureById = async (req, res) => {
 export const GetProcedureByName = async (req, res) => {
     const name = req.body.name;
     try {
-        const data = await ProcedureModel.findOne({ name });
+        const data = await ProcedureModel.findOne({ name: RegExp(name, "i") });
 
-        if(!data){
-            res.status(401).send({ error: `Procedure ${name} not found.` });
-        }else{
+        if (!data) {
+            res.status(401).send({ error: `Procedure named ${name} not found.` });
+        } else {
             res.send({ data });
         }
     } catch (err) {
@@ -64,11 +74,11 @@ export const GetProcedureByName = async (req, res) => {
 export const GetProceduresByType = async (req, res) => {
     const type = req.body.type;
     try {
-        const data = await ProcedureModel.findOne({ type });
+        const data = await ProcedureModel.findOne({ type: RegExp(type, "i") });
 
-        if(!data){
+        if (!data) {
             res.status(401).send({ error: `Not found Procedures with type ${type}.` });
-        }else{
+        } else {
             res.send({ data });
         }
     } catch (err) {
@@ -78,13 +88,20 @@ export const GetProceduresByType = async (req, res) => {
 
 export const CreateProcedure = async (req, res) => {
     const procedure = req.body;
+    const { id } = req.auth;
+    const _id = ObjectId(id);
     try {
-        const data = await ProcedureModel.create(procedure);
-        if(!data){
-            res.status(500).send({ error: `Error creating procedure ${procedure}` });
-        }else{
-            const { _id, name, type, description, products } = data;
-            res.send({ _id, name, type, description, products });
+        const auth = await userAuthorization(_id);
+        if(!auth.message){
+            const data = await ProcedureModel.create(procedure);
+            if (!data) {
+                res.status(500).send({ error: `Error creating procedure ${procedure}` });
+            } else {
+                const { _id, name, type, description, products } = data;
+                res.send({ _id, name, type, description, products });
+            }
+        } else {
+            res.status(401).send({ error: auth.message });
         }
     } catch (err) {
         res.send({ error: err });
@@ -93,13 +110,20 @@ export const CreateProcedure = async (req, res) => {
 
 export const UpdateProcedure = async (req, res) => {
     const procedure = req.body;
+    const { id } = req.auth;
+    const _id = ObjectId(id);
     try {
-        const data = await ProcedureModel.updateOne(procedure);
-        if(!data){
-            res.status(500).send({ error: `Error updating procedure ${procedure}` });
-        }else{
-            const { _id, name, type, description, products } = data;
-            res.send({ _id, name, type, description, products });
+        const auth = await userAuthorization(_id);
+        if (!auth.message) {
+            const data = await ProcedureModel.updateOne(procedure);
+            if (!data) {
+                res.status(500).send({ error: `Error updating procedure ${procedure}` });
+            } else {
+                const { _id, name, type, description, products } = procedure;
+                res.send({ _id, name, type, description, products });
+            }
+        } else {
+            res.status(401).send({ error: auth.message });
         }
     } catch (err) {
         res.send({ error: err });
@@ -107,11 +131,22 @@ export const UpdateProcedure = async (req, res) => {
 }
 
 export const DeleteProcedure = async (req, res) => {
-    const id = req.body;
-    const _id = ObjectId(id);
+    const { id } = req.body;
+    const { userId } = req.auth;
+    let _id = ObjectId(userId);
     try {
-        ProcedureModel.deleteOne({ _id });
-        res.send({ message: `Success to delete procedure id ${id}` });
+        const auth = await userAuthorization(_id);
+        if (!auth.message) {
+        _id = ObjectId(id);
+        const data = await ProcedureModel.deleteOne({ _id });
+        if (data.n) {
+            res.send({ message: `Success to delete Procedure id ${id}` });
+        } else {
+            res.send({ message: `Non-existent Procedure id ${id}` });
+        }
+    } else {
+        res.status(401).send({ error: auth.message });
+    }
     } catch (err) {
         res.send({ error: err });
     }
