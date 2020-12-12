@@ -2,28 +2,19 @@ import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
 
-const ProceduresSchema = new Schema({
+export const ProceduresSchema = new Schema({
     procedureId: {
-        type: ObjectId,
-        unique: true
-    },
-    clientId: {
-        type: ObjectId,
-        required: true
+        type: String
     },
     userId: {
-        type: ObjectId,
-        required: true,
+        type: String,
     },
     date: {
             type: String,
-            required: true,
     },
     hour: {
             type: String,
-            required: true,
-    }
-        
+    } 
 },
     {
         timestamps: true,
@@ -32,6 +23,3 @@ const ProceduresSchema = new Schema({
         versionKey: false,
     }
 );
-
-export const ProceduresModel = mongoose.model('procedures', ProceduresSchema);
-export const ObjectId = mongoose.Types.ObjectId;
