@@ -13,10 +13,15 @@ export const autentication = async (req, res, next) => {
         try {
             const payload = verify(token);
             const user = await UserModel.findById(payload.user);
-            if (!user) {
-                const client = await ClientModel.findById(payload.user);
+            if (user === null) {
+                let client = await ClientModel.findById(payload.client);
                 if (!client) {
                     res.status(401).send({ error: `User ${email} not found.` });
+                } else {
+                    client.procedures = []
+                    req.auth = client;
+                    req.auth.category = 1;
+                    next();
                 }
             } else {
                 req.auth = user;
