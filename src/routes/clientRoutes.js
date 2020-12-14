@@ -26,8 +26,6 @@ clientRoute.use((_, res, next) => {
     next();
 });
 
-clientRoute.get('/me', autentication, GetLoggedClient);
-
 clientRoute.get('/clients', autentication, GetClients);
 
 clientRoute.get('/procedures', autentication, GetProceduresByClient);
@@ -35,8 +33,6 @@ clientRoute.get('/procedures', autentication, GetProceduresByClient);
 clientRoute.put('/procedure', autentication, CreateProcedure);
 
 clientRoute.get('/date-availability', autentication, GetDateAvailability);
-
-clientRoute.get('/login', ClientLogin);
 
 clientRoute.post('/signup', ClientSignup);
 

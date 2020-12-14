@@ -1,4 +1,5 @@
 
+import { ClientModel } from '../models/client.model.js';
 import { ObjectId, UserModel } from '../models/user.model.js';
 import { getHeaderAuthorization } from '../utils/authorization.js'
 
@@ -13,10 +14,15 @@ export const autentication = async (req, res, next) => {
             const payload = verify(token);
             const user = await UserModel.findById(payload.user);
             if (!user) {
-                res.status(401).send({ error: `User ${email} not found.` });
+                const client = await ClientModel.findById(payload.user);
+                if (!client) {
+                    res.status(401).send({ error: `User ${email} not found.` });
+                }
+            } else {
+                req.auth = user;
+                req.auth.category = 1;
+                next();
             }
-            req.auth = user;
-            next();
         } catch (err) {
             res.send({ error: err });
         }
@@ -24,7 +30,7 @@ export const autentication = async (req, res, next) => {
 }
 
 export const RouterTest = (req, res) => {
-    res.send({message: "rota funcionando", route: req.method})
+    res.send({ message: "rota funcionando", route: req.method })
 }
 
 export const Signup = async (req, res) => {
@@ -44,12 +50,18 @@ export const Login = async (req, res) => {
     const [email, password] = getHeaderAuthorization(req.headers.authorization);
     try {
         const user = await UserModel.findOne({ email, password });
-
-        if(!user){
-            res.status(401).send({ error: `User ${email} not found.` });
+        if (user === null) {
+            const client = await ClientModel.findOne({ email, password });
+            if (!client) {
+                res.status(401).send({ error: `User ${email} not found.` });
+            } else {
+                const token = sign({ client: client.id });
+                res.send({ client, category: 2, token });
+            }
+        } else {
+            const token = sign({ user: user.id });
+            res.send({ user, category: 1, token });
         }
-        const token = sign({ user: user.id });
-        res.send({ user, token });
     } catch (err) {
         res.send({ error: err });
     }
@@ -80,14 +92,14 @@ export const UpdateUser = async (req, res) => {
     const body = req.body;
     try {
         let user = await UserModel.findOne({ "_id": obj });
-        for(let key in body){
+        for (let key in body) {
             user[key] = body[key]
         }
         const data = await UserModel.update({ "_id": obj }, user)
-        if(data.ok){
+        if (data.ok) {
             user = await UserModel.findOne({ "_id": obj });
             res.send(user);
-        }else{
+        } else {
             throw Error({
                 error: data
             })
