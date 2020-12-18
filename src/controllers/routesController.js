@@ -92,7 +92,7 @@ export const CreateUser = async (req, res) => {
 }
 
 export const UpdateUser = async (req, res) => {
-    const { id } = req.auth;
+    const { id } = req.body;
     const obj = ObjectId(id);
     const body = req.body;
     try {
@@ -114,6 +114,41 @@ export const UpdateUser = async (req, res) => {
     }
 }
 
-export const GetLoggedUser = (req, res) => {
+export const GetLoggedUser = async (req, res) => {
     res.send(req.auth);
+}
+
+export const GetUserById = async (req, res) => {
+    const id = req.params.id;
+    const _id = ObjectId(id);
+    try {
+        const user = await UserModel.findOne({ _id });
+        if(!user){
+            const client = await ClientModel.findOne(_id);
+            if(!client) {
+                res.status.send({ error: `Not found user by id ${id}`})
+            }else{
+                res.send(client)
+            }
+        } else {
+            res.send(user);
+        }
+    } catch (err) {
+        res.send({ error: err });
+    }
+}
+
+export const DeleteUser = async (req, res) => {
+    const id = req.params.id;
+    const _id = ObjectId(id);
+    try {
+        const data = await UserModel.deleteOne({ _id });
+        if (data.n) {
+            res.send({ message: `Success to delete user id ${id}` });
+        } else {
+            res.send({ message: `Non-existent user id ${id}` });
+        }
+    } catch (err) {
+        res.send({ error: err });
+    }
 }

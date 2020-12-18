@@ -10,7 +10,9 @@ import {
     GetLoggedUser, 
     autentication, 
     UpdateUser,
-    CreateUser
+    CreateUser,
+    GetUserById,
+    DeleteUser
 } from '../controllers/routesController.js';
 
 const routes = express();
@@ -27,9 +29,15 @@ routes.post('/signup', Signup);
 
 routes.get('/login', Login);
 
-routes.get('/users', autentication, CreateUser);
+routes.get('/user/id/:id', autentication, GetUserById)
 
-routes.post('/user', autentication, UpdateUser);
+routes.delete('/user/:id', autentication, DeleteUser)
+
+routes.get('/users', autentication, GetUsers);
+
+routes.post('/users', autentication, CreateUser);
+
+routes.put('/user', autentication, UpdateUser);
 
 routes.get('/me', autentication, GetLoggedUser);
 

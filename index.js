@@ -440,7 +440,7 @@ app.use('/v1/client', ClientRoute);
 
 app.use('/v1/procedure', ProcedureRoute);
 
-app.listen(3000, async () => {
+app.listen(3001, async () => {
     console.log("api em funcionamento");
     try {
         await db.mongoose.connect(db.url, {

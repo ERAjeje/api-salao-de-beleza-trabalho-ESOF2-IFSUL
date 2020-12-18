@@ -10,23 +10,29 @@ import {
     GetClients, 
     CreateProcedure, 
     GetProceduresByClient,
-    GetDateAvailability, 
+    GetDateAvailability,
+    GetClientById,
+    UpdateClient,
+    DeleteClient, 
 } from '../controllers/clientRoutesController.js';
 
 const clientRoute = express();
 
 clientRoute.use(bodyParser.json());
 clientRoute.use(bodyParser.urlencoded({ extended: true }));
-clientRoute.use((_, res, next) => {
-	//Qual site tem permissão de realizar a conexão
-    res.header("Access-Control-Allow-Origin", "localhost");
-	//Quais são os métodos que a conexão pode realizar na API
-    res.header("Access-Control-Allow-Methods", 'GET,PUT,POST,DELETE');
-    clientRoute.use(cors());
-    next();
-});
+clientRoute.use(cors({
+    "origin": '*',
+    "methods": "GET,PUT,POST,DELETE"
+}));
+
 
 clientRoute.get('/clients', autentication, GetClients);
+
+clientRoute.put('/', autentication, UpdateClient);
+
+clientRoute.get('/:id', autentication, GetClientById);
+
+clientRoute.delete('/:id', autentication, DeleteClient);
 
 clientRoute.get('/procedures', autentication, GetProceduresByClient);
 

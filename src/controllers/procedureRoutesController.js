@@ -10,17 +10,28 @@ export const autentication = async (req, res, next) => {
         const [type, token] = req.headers.authorization.split(" ");
         try {
             const payload = verify(token);
-            const user = await ClientModel.findById(payload.user);
-            if (!user) {
-                res.status(401).send({ error: `User ${email} not found.` });
+            const user = await UserModel.findById(payload.user);
+            if (user === null) {
+                let client = await ClientModel.findById(payload.client);
+                if (!client) {
+                    res.status(401).send({ error: `User ${email} not found.` });
+                } else {
+                    client.procedures = []
+                    req.auth = client;
+                    req.auth.category = 1;
+                    next();
+                }
+            } else {
+                req.auth = user;
+                req.auth.category = 1;
+                next();
             }
-            req.auth = user;
-            next();
         } catch (err) {
             res.send({ error: err });
         }
     }
 }
+
 
 const userAuthorization = async (_id) => {
     const user = await UserModel.findOne(_id)
@@ -41,7 +52,7 @@ export const GetProcedures = async (_, res) => {
 }
 
 export const GetProcedureById = async (req, res) => {
-    const id = req.body.id;
+    const id = req.params.id;
     try {
         const _id = ObjectId(id);
         const data = await ProcedureModel.findOne({ _id });
@@ -75,7 +86,6 @@ export const GetProceduresByType = async (req, res) => {
     const type = req.body.type;
     try {
         const data = await ProcedureModel.findOne({ type: RegExp(type, "i") });
-
         if (!data) {
             res.status(401).send({ error: `Not found Procedures with type ${type}.` });
         } else {
@@ -115,7 +125,7 @@ export const UpdateProcedure = async (req, res) => {
     try {
         const auth = await userAuthorization(_id);
         if (!auth.message) {
-            const data = await ProcedureModel.updateOne(procedure);
+            const data = await ProcedureModel.updateOne({ "_id": procedure.id }, procedure);
             if (!data) {
                 res.status(500).send({ error: `Error updating procedure ${procedure}` });
             } else {
@@ -131,15 +141,15 @@ export const UpdateProcedure = async (req, res) => {
 }
 
 export const DeleteProcedure = async (req, res) => {
-    const { id } = req.body;
-    const { userId } = req.auth;
+    const { id } = req.params;
+    const userId = req.auth.id;
     let _id = ObjectId(userId);
     try {
         const auth = await userAuthorization(_id);
         if (!auth.message) {
         _id = ObjectId(id);
         const data = await ProcedureModel.deleteOne({ _id });
-        if (data.n) {
+        if (data.n == 1) {
             res.send({ message: `Success to delete Procedure id ${id}` });
         } else {
             res.send({ message: `Non-existent Procedure id ${id}` });
@@ -151,3 +161,4 @@ export const DeleteProcedure = async (req, res) => {
         res.send({ error: err });
     }
 }
+

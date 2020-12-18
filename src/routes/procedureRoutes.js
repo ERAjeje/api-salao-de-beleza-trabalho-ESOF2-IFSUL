@@ -26,7 +26,7 @@ procedureRoute.use(cors({
 
 procedureRoute.get('/', autentication, GetProcedures);
 
-procedureRoute.get('/id', autentication, GetProcedureById);
+procedureRoute.get('/:id', autentication, GetProcedureById);
 
 procedureRoute.get('/name', autentication, GetProcedureByName);
 
@@ -36,7 +36,7 @@ procedureRoute.post('/',  autentication, CreateProcedure);
 
 procedureRoute.put('/update', autentication, UpdateProcedure);
 
-procedureRoute.delete('/delete', autentication, DeleteProcedure);
+procedureRoute.delete('/delete/:id', autentication, DeleteProcedure);
 
 
 export default procedureRoute;

@@ -14,7 +14,7 @@ productRoute.use(cors({
 
 productRoute.get('/', autentication, GetProducts);
 
-productRoute.get('/id', autentication, GetProductById);
+productRoute.get('/:id', autentication, GetProductById);
 
 productRoute.get('/name', autentication, GetProductByName);
 
@@ -24,7 +24,7 @@ productRoute.post('/', autentication, CreateProduct);
 
 productRoute.put('/update', autentication, UpdateProduct);
 
-productRoute.delete('/delete', autentication, DeleteProduct);
+productRoute.delete('/:id', autentication, DeleteProduct);
 
 
 

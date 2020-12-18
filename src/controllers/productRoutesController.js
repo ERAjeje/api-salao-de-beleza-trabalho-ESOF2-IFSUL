@@ -33,11 +33,10 @@ export const GetProducts = async (_, res) => {
 }
 
 export const GetProductById = async (req, res) => {
-    const id = req.body.id;
+    const id = req.params.id;
     try {
         const _id = ObjectId(id);
         const data = await ProductModel.findOne({ _id });
-
         if (!data) {
             res.status(401).send({ error: `Product ${id} not found.` });
         } else {
@@ -95,8 +94,9 @@ export const CreateProduct = async (req, res) => {
 
 export const UpdateProduct = async (req, res) => {
     const Product = req.body;
+    const _id = Product.id
     try {
-        const data = await ProductModel.updateOne(Product);
+        const data = await ProductModel.updateOne({ _id }, Product);
         if (!data) {
             res.status(500).send({ error: `Error updating Product ${Product}` });
         } else {
@@ -108,7 +108,7 @@ export const UpdateProduct = async (req, res) => {
 }
 
 export const DeleteProduct = async (req, res) => {
-    const id = req.body.id;
+    const id = req.params.id;
     try {
         const _id = ObjectId(id);
         const data = await ProductModel.deleteOne({ _id });
